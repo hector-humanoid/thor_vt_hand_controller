@@ -50,6 +50,13 @@ namespace thor_vt_hand_grasp_controller{
       // Initialize the generic manipulation controller components
       initializeManipulationController(nh,nhp);
 
+
+      std::string traj_namespace = "/thor_mang";
+      if (!nhp.getParam("traj_controller_namespace", traj_namespace)){
+          ROS_WARN(" Did not find /traj_controller_namespace parameter - using /thor_mang as default");
+      }else
+          ROS_INFO("Trajectory controller namespace parameter received: %s", traj_namespace.c_str());
+
       ROS_INFO("Initializing VT Hand Grasp controller");
 
       //Initializing Trajectory action for fingers
@@ -74,7 +81,7 @@ namespace thor_vt_hand_grasp_controller{
 
       ROS_INFO("Close joint positions initialized");
 
-      this->trajectory_client_ = new  thor_vt_hand_grasp_controller::TrajectoryActionClient("/thor_mang/"+this->hand_side_+"_hand_traj_controller/follow_joint_trajectory", true);
+      this->trajectory_client_ = new  thor_vt_hand_grasp_controller::TrajectoryActionClient(traj_namespace+"/"+this->hand_side_+"_hand_traj_controller/follow_joint_trajectory", true);
       while(!this->trajectory_client_->waitForServer(ros::Duration(5.0)))
          ROS_INFO("Waititing for %s TrajectoryActionServer", this->hand_side_.c_str());
 
